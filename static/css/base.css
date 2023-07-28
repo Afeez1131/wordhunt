@@ -1,0 +1,500 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+
+/* Reset some default styles */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /*background-color: #eeeeee; !* Light gray background *!*/
+    margin: 0;
+    padding: 0;
+    font-family: "Arial", sans-serif; /* Different font for the interface */
+    line-height: 1.6;
+    color: #fff;
+    background-color: #111;
+}
+
+/*homepage begins*/
+
+/* Dark theme styles */
+.dark-bg {
+    background-color: #111;
+}
+
+/* Custom styles for the navigation buttons */
+.nav-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.nav-buttons .nav-item {
+    margin-right: 10px;
+}
+
+.dark-bg .nav-link {
+    color: #fff;
+}
+
+.dark-bg .nav-link:hover {
+    color: #ff8c00;
+}
+
+.dark-bg .navbar-brand {
+    color: #fff;
+}
+
+.dark-bg .navbar-brand:hover {
+    color: #ff8c00;
+}
+
+/* Hero section styles */
+.hero {
+    /*background-image: url(''); !* Replace with your hero image URL *!*/
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    text-align: center;
+    color: #fff;
+    filter: brightness(80%);
+    background-repeat: repeat; /* Ensure the background image repeats to create a seamless scrolling effect */
+
+}
+
+/* Define the scrolling animation keyframes */
+@keyframes scrollHeroImage {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 100% 0; /* Adjust the scrolling direction (e.g., 100% 0 for horizontal scroll, 0 100% for vertical scroll) */
+    }
+}
+
+
+.hero h1 {
+    font-size: 64px;
+    margin-bottom: 20px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.hero p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.start-button {
+    font-size: 24px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* About the Game section styles */
+.about-game {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.about-game h2 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bolder;
+}
+
+.about-game p {
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 30px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-style: italic;
+}
+
+/* Instructions section styles */
+.instructions {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: #222;
+}
+
+.instructions h2 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.instructions ul {
+    list-style: none;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.instructions li {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    color: white;
+}
+
+/* Footer styles */
+footer {
+    background-color: #111;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+footer p {
+    font-size: 14px;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .hero p {
+        font-size: 18px;
+    }
+
+    .about-game h2,
+    .instructions h2 {
+        font-size: 24px;
+    }
+
+    .about-game p {
+        color: black;
+        font-size: 16px;
+    }
+
+    .instructions li {
+        font-size: 16px;
+        color: white;
+    }
+}
+
+/* homepage ends */
+#countdown-container {
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+    color: #ffffff; /* White text color */
+}
+
+/* Pulsating animation */
+.pulsate {
+    animation: pulsate 1s ease-in-out infinite;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#heading {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Ubuntu', sans-serif;
+    font-style: italic;
+}
+
+#quote {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-family: 'Ubuntu', sans-serif;
+    font-style: italic;
+}
+
+#countdown {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 200px;
+
+}
+
+#chat-section {
+    display: none;
+    max-width: 500px;
+    margin: 30px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: "Arial", sans-serif; /* Use the interface font */
+}
+
+#group-name {
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+}
+
+#group-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+#chat-messages {
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#chat-messages {
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* System message style */
+.system-message .message-text {
+    padding: 10px;
+    text-align: left;
+    background-color: #f1f1f1; /* Light gray background for system message */
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    max-width: 80%;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+.message {
+    margin-bottom: 10px;
+}
+
+.backend-message {
+    text-align: center;
+    font-style: italic;
+    color: #888888; /* Gray color for backend message */
+}
+
+.user-message {
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.other-user-message {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.message-text {
+    padding: 10px;
+    border-radius: 20px; /* Rounded border */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    max-width: 70%;
+    background-color: #f1f1f1;
+    word-wrap: break-word; /* Handle long messages */
+}
+
+.user-name {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.message-time {
+    color: #888888;
+    font-size: 12px;
+}
+
+.message {
+    margin-bottom: 10px;
+}
+
+#chat-input {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Style the submit button */
+#chat-input .btn-primary {
+    background-color: #4CAF50; /* Green background */
+    border-color: #4CAF50; /* Green border */
+    transition: background-color 0.3s ease-in-out;
+}
+
+#chat-input .btn-primary:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* login */
+#login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+    font-family: 'Space Grotesk', sans-serif;
+    color: #ffffff; /* White text color */
+}
+
+.black-btn {
+    background-color: black;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 2px;
+}
+#login-box {
+    max-width: 800px;
+    padding: 60px;
+    background-color: #ffffff;
+    color: #222222;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-heading {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #222222;
+}
+
+/* Style the form input fields and submit button */
+.form-control {
+    margin-bottom: 21px;
+}
+
+.btn-primary {
+    background-color: #4CAF50; /* Green background */
+    border-color: #4CAF50; /* Green border */
+    transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* Your additional custom CSS styles here */
+/* lobby css */
+/* Lobby section styles */
+.lobby-section {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: black;
+    color: #f1f1f1;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.lobby-section h2 {
+    font-size: 36px;
+    margin-bottom: 30px;
+}
+
+.lobby-section .player-list {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.lobby-section .player-list li {
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 10px;
+}
+
+.lobby-section .player-list img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.lobby-section .chat-box {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: left;
+    overflow-y: scroll;
+    max-height: 300px;
+    color: #222222;
+}
+
+.lobby-section .chat-box .message {
+    font-size: 16px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.lobby-section .chat-box .message.receiver {
+    background-color: #DCF8C6;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.lobby-section .chat-box .message.sender {
+    background-color: #E5E5E5;
+    text-align: left;
+    padding-left: 15px;
+}
+
+.lobby-section .chat-box .message span {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.lobby-section .chat-box .message .date {
+    font-size: 12px;
+    color: #777;
+}
+
+.lobby-section .chat-input {
+    max-width: 800px;
+    margin: 20px auto 0;
+}
+
+.lobby-section .chat-input input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+.lobby-section .chat-input button {
+    flex: 0 0 auto;
+    width: 120px;
+    background-color: #888888;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px; /* Add margin-left to space the button from the input */
+}
+
+.lobby-section .start-button {
+    font-size: 24px;
+    padding: 20px 40px;
+}

@@ -1,0 +1,113 @@
+{% extends 'core/_base.html' %}
+{% load static %}
+
+{% block title %}room name {% endblock title %}
+
+{% block content %}
+   <!-- Hero section -->
+    <section class="hero" style="background-image: url('{% static 'img/bg-2.jpg' %}')">
+        <h1>Word Warrior</h1>
+        <p>The Ultimate Word Game for Word Enthusiasts!</p>
+        <button class="start-button">Start Playing</button>
+    </section>
+
+    <!-- About the Game section -->
+    <section class="about-game">
+        <div class="container">
+            <h2>About the Game</h2>
+            <p>
+                Word Warrior is an exhilarating word-building game that puts your
+                vocabulary and creativity to the test.
+                The game begins with a base word generated. Your challenge is to form as many valid English words as possible from the given base word within a time limit. Are you ready to become a true Word Warrior?
+            </p>
+        </div>
+    </section>
+    <!-- Instructions section -->
+    <section class="instructions">
+        <div class="container">
+            <h2>Instructions</h2>
+            <ul>
+                <li>1. Enter the words you can form from the given base word in the chat box.</li>
+                <li>2. Be creative and explore various combinations to come up with new words.</li>
+                <li>3. Each word you form must be a valid English word to count.</li>
+                <li>4. The player who forms the highest number of valid words wins the game.</li>
+                <li>5. Enjoy the game and have fun!</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Word Warrior. All rights reserved.</p>
+        </div>
+    </footer>
+
+{% endblock content %}
+
+{% block extra_script %}
+    <script>
+        /* Variables */
+        var body = $('body');
+        var scheme = body.data('scheme')
+        var host = body.data('host')
+        var protocol = scheme === 'http' ? 'ws://' : 'wss://'
+        const url = protocol + host + '/ws/game/'
+        console.log(url);
+        {#const socket = new WebSocket(url);#}
+
+        socket.onopen = function () {
+            console.log('connection success...');
+        }
+
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            console.log(data);
+            switch (data.action) {
+                case "connected":
+                    $('p#connected').text(data.message)
+                    $('#container').html(data.html);
+                    break;
+                case "time":
+                    $('p#time').text(data.message);
+                    break;
+                case "authenticate":
+
+            }
+        }
+
+        function authenticateUser() {
+            var username = $("#username").val();
+            var password = $('#password').val();
+            var request = '{{ request }}';
+            const message = {
+                'action': 'authenticate',
+                'data': {
+                    'username': username,
+                    'password': password,
+                    'request': request
+                }
+            }
+            sendData(message, socket)
+        }
+
+        function sendData(message, socket) {
+            socket.send(JSON.stringify(message));
+        }
+
+        // JavaScript code for smooth scrolling effect
+        (function() {
+            const heroSection = document.getElementsByClassName('hero');
+            const scrollSpeed = 0.1; // Adjust the scrolling speed (smaller value = faster scrolling)
+
+            function updateScroll() {
+                const scrollOffset = window.scrollY * scrollSpeed;
+                heroSection.style.backgroundPositionX = `-${scrollOffset}px`;
+                requestAnimationFrame(updateScroll);
+            }
+
+            updateScroll();
+        })();
+    </script>
+{% endblock extra_script %}
+

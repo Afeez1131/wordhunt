@@ -1,0 +1,63 @@
+{% extends 'core/_base.html' %}
+{% load static %}
+
+{% block title %}Lobby{% endblock title %}
+{% block extra_head %}
+    <script defer type="text/javascript" src="{% static 'js/lobby.js' %}"></script>
+    <script defer type="text/javascript" src="{% static 'js/lobby_chat.js' %}"></script>
+{% endblock extra_head %}
+
+{% block content %}
+    <div id="countdown-container">
+        <h1 id="heading"></h1>
+        <div id="countdown" class="font-game text-center">5</div>
+        <h4 id="quote" class="font-game">
+        </h4>
+    </div>
+    <section class="lobby-section" id="lobby-section" style="display: none;">
+        <div class="container">
+            <h2>Welcome to the Lobby</h2>
+            <h3>Players in the Lobby:</h3>
+            <ul class="list-unstyled player-list">
+                <li>
+                    <img src="https://via.placeholder.com/80" alt="Player 1">
+                    <div>Player 1</div>
+                </li>
+                <li>
+                    <img src="https://via.placeholder.com/80" alt="Player 2">
+                    <div>Player 2</div>
+                </li>
+                <li>
+                    <img src="https://via.placeholder.com/80" alt="Player 3">
+                    <div>Player 3</div>
+                </li>
+                <!-- Add more player placeholders as needed -->
+            </ul>
+
+            <div class="chat-box mt-4 p-3 rounded">
+                <div class="message receiver mb-2">
+                    <span class="font-weight-bold">Player 2:</span> Hey, is everyone ready to play?
+                    <span class="date">2023-07-26 10:15 AM</span>
+                </div>
+                <div class="message sender mb-2">
+                    <span class="font-weight-bold">Player 1:</span> Yes, I am! Let's get started.
+                    <span class="date">2023-07-26 10:20 AM</span>
+                </div>
+                <div class="message receiver mb-2">
+                    <span class="font-weight-bold">Player 3:</span> I'm excited for this game!I'm excited for this
+                    game!I'm excited for this game!I'm excited for this game!I'm excited for this game!
+                    <span class="date">2023-07-26 10:25 AM</span>
+                </div>
+                <!-- Add more dummy messages from different users -->
+            </div>
+            <div class="chat-input d-flex">
+                <input type="text" placeholder="Type your message..." id="chat-message">
+                <button class="btn btn-secondary" id="send-button">Send</button>
+            </div>
+            <button class="btn btn-success start-button mt-4" onclick="startGame()">Start Game</button>
+        </div>
+    </section>
+
+{% endblock content %}
+
+
