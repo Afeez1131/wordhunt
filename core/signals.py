@@ -9,11 +9,10 @@ def update_members_count(sender, instance, created, **kwargs):
     if created:
         Lobby.objects.create(game_room=instance)
     count = instance.members.count()
-    instance.members_count = count
-    instance.save()
+    GameRoom.objects.filter(pk=instance.pk).update(members_count=count)
 
 
 @receiver(post_save, sender=Lobby)
 def update_user_joined_lobby(sender, instance, **kwargs):
-    instance.joined_count = instance.members.count()
-    instance.save()
+    count = instance.members.count()
+    Lobby.objects.filter(pk=instance.pk).update(joined_count=count)

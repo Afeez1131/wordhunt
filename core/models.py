@@ -12,6 +12,7 @@ class GameRoom(models.Model):
     room_name = models.UUIDField(default=uuid.uuid4().hex, unique=True)
     members = models.ManyToManyField(User, blank=True)
     members_count = models.PositiveIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return '{}: {} members'.format(self.room_name, self.members_count)
@@ -25,6 +26,7 @@ class Lobby(models.Model):
     lobby_name = models.UUIDField(default=uuid.uuid4(), unique=True)
     members = models.ManyToManyField(User, blank=True)
     joined_count = models.PositiveIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return '{}: {}'.format(self.game_room.room_name, self.joined_count)
