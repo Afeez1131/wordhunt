@@ -26,8 +26,8 @@ SECRET_KEY = 'django-insecure-d+ksi2^j^m7ri9b(@9u92(64%zr-b5u66fg_rqg(z+8vubioht
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://4538-102-88-37-142.ngrok-free.app']
 
 # Application definition
 
@@ -41,19 +41,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'core.apps.CoreConfig',
-    'account.apps.AccountConfig'
+    'account.apps.AccountConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+CORS_ALLOWED_ORIGINS = [
+    'https://4538-102-88-37-142.ngrok-free.app'
+]
 ROOT_URLCONF = 'wordhunt.urls'
 
 TEMPLATES = [
@@ -139,11 +143,54 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'account.authentication.GameParticipantsAuthentication',
-]
-AUTH_USER_MODEL = 'account.CustomUser'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
+}
+
+LOG_DIR = os.path.join(BASE_DIR, 'logs') # the log dir
+os.makedirs(LOG_DIR, exist_ok=True) # check to see if we have the directory, if not, create it.
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        # different formatting style you want to use for different handlers.
+        "simple": {
+            "format": "%(levelname)s %(asctime)s %(message)s"
+            # INFO: 2023-07-29 18:44:33,315: invalid username and or password
+            # LEVEL NAME, TIMESTAMP, AND MESSAGE
+        },
+        "detailed": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(message)s"
+            # INFO: 2023-07-29 18:44:33,315: views: invalid username and or password
+            # LEVEL NAME, TIMESTAMP MODULE, AND MESSAGE
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "simple"
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "level": "INFO",
+            "filename": os.path.join(LOG_DIR, 'logging.log'),
+            "formatter": "detailed",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+        },
+        "account": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+        },
+        "core": {
+            "handlers": ["console", "file"],
+            "level": "INFO"
+        }
+    }
 }

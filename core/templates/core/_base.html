@@ -13,36 +13,54 @@
 {% block extra_head %} {% endblock extra_head %}
 <body data-host="{{ request.get_host }}" data-scheme="{{ request.scheme }}">
 <!-- Navigation -->
-    <nav class="navbar navbar-expand-md dark-bg navbar-fixed-top">
-        <a class="navbar-brand" href="#">Word Warrior</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto nav-buttons"> <!-- Add the 'nav-buttons' class here -->
-                <li class="nav-item">
-                    <button class="nav-link btn btn-dark">Home</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link btn btn-dark">About</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link btn btn-dark">Instructions</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link btn btn-dark">Play Now</button>
-                </li>
-            </ul>
-        </div>
-    </nav>
+<nav class="navbar navbar-expand-md dark-bg navbar-fixed-top">
+    <a class="navbar-brand" href="#">Word Warrior</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto nav-buttons"> <!-- Add the 'nav-buttons' class here -->
+            <li class="nav-item">
+                <a href="{% url 'core:home' %}" class="nav-link btn btn-dark">Home</a>
+            </li>
+            <li class="nav-item">
+                <a href="#about" class="nav-link btn btn-dark">About</a>
+            </li>
+            <li class="nav-item">
+                <a href="#instruction" class="nav-link btn btn-dark">Instructions</a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'accounts:login' %}" class="nav-link btn btn-dark">Play Now</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
 {% block content %}
 
 
 {% endblock content %}
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% block extra_script %}
 
 {% endblock extra_script %}

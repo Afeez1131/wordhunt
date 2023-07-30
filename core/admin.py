@@ -11,5 +11,5 @@ class GameRoomAdmin(admin.ModelAdmin):
 
 @admin.register(Lobby)
 class LobbyAdmin(admin.ModelAdmin):
-    list_display = ['game_room', 'lobby_name', 'joined_count']
+    list_display = ['game_room', 'lobby_name', 'shortcode', 'joined_count']
     list_filter = ['game_room', 'lobby_name']

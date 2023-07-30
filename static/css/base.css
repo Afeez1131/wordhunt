@@ -348,7 +348,6 @@ footer p {
     height: 100vh;
     background-color: black;
     font-family: 'Space Grotesk', sans-serif;
-    color: #ffffff; /* White text color */
 }
 
 .black-btn {
@@ -356,6 +355,7 @@ footer p {
     color: white;
     padding: 10px 15px;
     border-radius: 2px;
+    margin-bottom: 25px;
 }
 #login-box {
     max-width: 800px;
@@ -366,6 +366,15 @@ footer p {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.login-footer {
+    color: #111111;
+    text-align: right;
+}
+
+.login-footer:hover {
+    color: #888888;
+    text-decoration: none;
+}
 .form-heading {
     text-align: center;
     font-size: 32px;
@@ -497,4 +506,8 @@ footer p {
 .lobby-section .start-button {
     font-size: 24px;
     padding: 20px 40px;
+}
+
+#error {
+    color: red;
 }

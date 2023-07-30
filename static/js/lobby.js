@@ -32,24 +32,12 @@ const chatSection = $('#chat-section');
 const input = $('#text-input')
 
 // typing effects
-$(document).ready(function() {
-    const textToType = "Welcome to WordWarriors!"; // Text to be typed
-    const typingSpeed = 100; // Speed of typing in milliseconds (lower value means faster typing)
 
-    // Function to display typing effect
-    function typeText(index) {
-        if (index <= textToType.length) {
-            $("#heading").text(textToType.slice(0, index));
-            setTimeout(function() {
-                typeText(index + 1);
-            }, typingSpeed);
-        }
-    }
 
-    // Start the typing effect on page load
-    typeText(0);
+$("#nameModal").on("hidden.bs.modal", function () {
+    // put your default event here
+    startCount()
 });
-
 
 // JavaScript code for pulsating animation
 function startPulsating() {
@@ -69,30 +57,59 @@ function displayRandomQuote() {
     quoteElement.textContent = quotes[randomIndex];
 }
 
-// Start pulsating and the countdown when the page loads
-window.onload = function () {
+function startCount() {
+    countdownTimer();
     displayRandomQuote(); // Display a random quote before the countdown
     setTimeout(() => {
         startPulsating();
         setTimeout(stopPulsating, 5000); // Stop pulsating after 5 seconds (or the desired countdown duration)
     }, 1000); // Delay the start of pulsating for 3 seconds (or the desired quote display duration)
-};
+}
 
 
-// Countdown timer
-let count = 5;
-const countdownInterval = setInterval(() => {
-    console.log(count);
-    countdownElem.text(count);
-    count--;
-    if (count < 0) {
-        $('#lobby-section').show();
-        countdownContainer.hide();
-        clearInterval(countdownInterval);
-    }
-}, 1000);
+function countdownTimer() {
+    // Countdown timer
+    let count = 5;
+    const countdownInterval = setInterval(() => {
+        console.log(count);
+        countdownElem.text(count);
+        count--;
+        if (count < 0) {
+            $('#lobby-section').show();
+            countdownContainer.hide();
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+}
+
 
 function startGame() {
     // Code to start the game, initialize WebSocket connection, etc.
     // Implement user authentication if required.
 }
+
+function verifyUsername(url) {
+    $.ajax({
+    url: url,
+    type: 'POST',
+    dataType: 'JSON',
+    data: {
+        'csrfmiddlewaretoken': getCookie('csrftoken'),
+        'username': $('#modal-username').val(),
+        'password': $('#modal-password').val()
+    },
+    success: function (resp) {
+        if (resp.status === 'success') {
+            $('#nameModal').modal('hide');
+        }
+        if (resp.status === 'error') {
+            $('#error').text(resp.error)
+        }
+    },
+    error: function () {
+        console.log('error occured')
+    }
+})
+}
+
+

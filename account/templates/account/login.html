@@ -4,21 +4,119 @@
 
 {% block content %}
 
-<div id="login-container">
+    <div id="login-container">
         <div id="login-box">
-            <h2 class="form-heading">WordWarriors - Login</h2>
             {% include 'account/_message_alert.html' %}
-            <form method="post">
+            {% if not request.user.is_authenticated %}
+                <h2 class="form-heading">Login</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password"
+                               required>
+                    </div>
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    <button type="submit" id="authenticate" class="black-btn btn-block">Login</button>
+                </form>
+                <span>Don't have an Account? <a href="" class="login-footer">Register Here...</a></span>
+                <hr>
+                <h1 class="text-center">OR</h1>
+
+            {% endif %}
+
+            <form method="post" action="{% url 'core:verify_code' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    <input type="text" class="form-control" id="code" name="code" placeholder="Enter Game Code">
                 </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                </div>
-                <input type="hidden" name="next" value="{{ request.GET.next }}">
-                <button type="submit" id="authenticate" class="black-btn btn-block">Login</button>
+                <button type="submit" id="authenticate" class="black-btn btn-block">Join</button>
             </form>
+            {% if request.user.is_authenticated %}
+                <button type="submit" id="start-game" class="black-btn btn-block">Start New Game</button>
+            {% endif %}
+        </div>
+
+    </div>
+    {#  get player's name modal #}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#invitationModal" hidden>
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="invitationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Invitation:</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row p-3">
+                            <textarea name="invitation-text" id="invitation-text" cols="30" rows="4"
+                                      class="form-control"></textarea>
+                        </div>
+                        <button type="button" name="copy-button" id="copy-button" class="black-btn btn-block">Copy
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <div class="row p-3">
+                            <div class="col-sm-8">
+                                <input type="text" name="code" id="code" class="form-control">
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" name="copy-button" id="copy-button" class="black-btn">Copy Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success"
+                            onclick="verifyUsername('{% url "accounts:ajax_login_user" %}');">Continue
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}
+{% block extra_script %}
+    <script>
+        $("#start-game").click(() => {
+            console.log('clicked');
+            $.ajax({
+                url: '{% url 'core:ajax_create_game' %}',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    'csrfmiddlewaretoken': getCookie('csrftoken')
+                },
+                success: function (resp) {
+                    console.log('in success');
+                    if (resp.status === 'success') {
+                        console.log('success');
+                        $('#invitation-text').val(resp.invitation);
+                        $('#invitationModal').modal('show');
+                    }
+                    if (resp.status === 'error') {
+                        alert(resp.error)
+                    }
+                },
+                error: function () {
+                    console.log('error');
+                }
+            })
+        })
+
+    </script>
+{% endblock %}
