@@ -7,6 +7,11 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.contrib.auth import authenticate
 from django.template.loader import render_to_string
+import logging
+
+from core.models import Lobby
+
+logger = logging.getLogger(__name__)
 
 
 class WordHuntConsumer(JsonWebsocketConsumer):
@@ -78,15 +83,69 @@ class LobbyChatConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super(LobbyChatConsumer, self).__init__(*args, **kwargs)
         self.room_name = None
+        self.lobby = None
+        self.user = None
 
     def connect(self):
-        print('connecting to lobby chat...')
-        args = self.scope.get('url_route').get('kwargs').get('name')
-        print('args: ', args)
+        logger.info('connecting to lobby chat...')
+        self.user = self.scope.get('user')
+        if not self.user.is_authenticated:
+            logger.info('user not authenticated')
+            self.close(code='103')
+        lobby_uuid = self.scope.get('url_route').get('kwargs').get('uuid')
+        if not Lobby.objects.filter(lobby_name=lobby_uuid).exists():
+            logger.info(f'invalid lobby uuid: {lobby_uuid}')
+            self.close()
         self.accept()
+        self.lobby = Lobby.objects.get(lobby_name=lobby_uuid)
+        self.room_name = str(self.lobby.lobby_name)
+        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
+        self.lobby.add(self.user.id)
+        if self.lobby.members_count > 1:
+            self.send_all_members()
+        else:
+            self.send_player_information()
+        logger.info(f'websocket connection established for {self.user} in {self.room_name}')
 
-    def disconnect(self, code):
-        return super(LobbyChatConsumer, self).disconnect(code)
+    def close(self, code=None):
+        logger.info('closing connection...')
+        return super(LobbyChatConsumer, self).close(code)
+
+    def disconnect(self, code=None):
+        logger.info('disconnecting...')
+        logger.info(f'removing {self.user} from {self.room_name}')
+        self.lobby.remove(self.user.id)
+        self.send_all_members()
+        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
+        # return super(LobbyChatConsumer, self).disconnect(code)
 
     def receive_json(self, content, **kwargs):
         print('content: ', content)
+
+    def send_player_information(self):
+        player = self.user.username
+        player_image = render_to_string('core/player_image.html', {'username': player})
+        async_to_sync(self.channel_layer.group_send)(self.room_name,
+                                                     {
+                                                         'type': 'player_joined',
+                                                         'data': {
+                                                             'message': '{} joined the Lobby'.format(player),
+                                                             'image': player_image
+                                                         }
+                                                     })
+
+    def send_all_members(self):
+        players = self.lobby.members.all()
+        logger.info(players)
+        players_images = render_to_string('core/all_players_image.html', {'players': players})
+        async_to_sync(self.channel_layer.group_send)(self.room_name, {
+            'type': 'all_players',
+            'data': {
+                'images': players_images
+            }
+        })
+    def player_joined(self, event):
+        self.send_json(event)
+
+    def all_players(self,event):
+        self.send_json(event)

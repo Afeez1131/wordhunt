@@ -360,6 +360,7 @@ footer p {
 #login-box {
     max-width: 800px;
     padding: 60px;
+    margin: auto;
     background-color: #ffffff;
     color: #222222;
     border-radius: 10px;
@@ -508,6 +509,6 @@ footer p {
     padding: 20px 40px;
 }
 
-#error {
+.error {
     color: red;
 }

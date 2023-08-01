@@ -23,7 +23,7 @@ application = ProtocolTypeRouter({
     'websocket': AuthMiddlewareStack(
         URLRouter([
             path('ws/game/', consumers.WordHuntConsumer.as_asgi()),
-            path(r'ws/lobby/<str:name>/', consumers.LobbyChatConsumer.as_asgi()),
+            path(r'ws/lobby/<str:uuid>/', consumers.LobbyChatConsumer.as_asgi()),
         ])
     )
 })

@@ -41,25 +41,74 @@
 
 
 {% endblock content %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+  $(document).ready(function() {
+    // Function to escape special characters for regular expression
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    }
+
+    // Function to sanitize input and prevent XSS attacks
+    function sanitizeInput(input) {
+      const specialChars = ['<', '>', '&', '"', "'", '/', '`', '=', '%', '?', ';', ':', ',', '|', '\\', '^', '~', '[', ']', '{', '}', '(', ')', '$', '#', '@', '+', '*', '!'];
+
+      const keywords = ['<script', 'onload', 'onunload', 'onblur', 'onerror', 'onfocus', 'onresize', 'onscroll', 'onsubmit', 'onreset', 'onselect', 'onchange', 'onkeydown',
+          'onkeypress', 'onkeyup', 'onclick', 'ondblclick', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'eval', 'expression', 'alert', 'prompt', 'confirm',
+            'document.cookie', 'document.write', 'document.writeln', 'window.location', 'window.open', 'script', 'setTimeout', 'setInterval', 'XMLHttpRequest', 'fetch', 'localStorage',
+          'sessionStorage', 'cookie', 'meta http-equiv', 'Content-Type', 'Content-Disposition', 'refresh', 'iframe', 'object', 'embed', 'applet', 'form', 'input', 'textarea', 'button',
+          'select', 'style', 'a href', 'img src', 'video', 'audio', 'source', 'area', 'basefont', 'bgsound', 'layer', 'ilayer', 'svg', 'onloadstart', 'onprogress', 'onerror', 'onloadend',
+          'javascript', 'vbscript', 'data:', 'expression(', 'style=', 'url(', 'src=', 'href=', 'dynsrc=', 'lowsrc=', 'codebase=', 'background-image:', 'behavior:', 'xlink:href',
+          'xss', 'x-alert', 'xss-string', 'xss-image', 'javascript:', 'eval(', 'location.href', 'document.location', 'document.URL'];
+
+      let sanitizedInput = input;
+
+      // Remove special characters
+      for (const char of specialChars) {
+        const regex = new RegExp(escapeRegExp(char), 'g');
+        sanitizedInput = sanitizedInput.replace(regex, '');
+      }
+
+      // Remove keywords
+      for (const keyword of keywords) {
+        const escapedKeyword = keyword.split('').map(escapeRegExp).join('');
+        const regex = new RegExp(escapedKeyword, 'gi');
+        sanitizedInput = sanitizedInput.replace(regex, '');
+      }
+
+      return sanitizedInput;
+    }
+
+    // Add event listener to all fields with the "xss-safe" class
+    $('.xss-safe').on('keyup', function() {
+      const inputValue = $(this).val();
+      const sanitizedValue = sanitizeInput(inputValue);
+      $(this).val(sanitizedValue);
+    });
+  });
+</script>
+
+
+<script>
     function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
 </script>
 {% block extra_script %}
 

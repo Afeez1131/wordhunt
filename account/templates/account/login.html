@@ -12,11 +12,11 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group">
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                        <input type="text" class="form-control xss-safe" id="username" name="username" placeholder="Username"
                                required>
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Password"
+                        <input type="password" class="form-control xss-safe" id="password" name="password" placeholder="Password"
                                required>
                     </div>
                     <input type="hidden" name="next" value="{{ request.GET.next }}">
@@ -31,7 +31,7 @@
             <form method="post" action="{% url 'core:verify_code' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <input type="text" class="form-control" id="code" name="code" placeholder="Enter Game Code">
+                    <input type="text" class="form-control xss-safe" id="code" name="code" placeholder="Enter Game Code">
                 </div>
                 <button type="submit" id="authenticate" class="black-btn btn-block">Join</button>
             </form>

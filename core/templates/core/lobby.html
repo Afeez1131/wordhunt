@@ -18,20 +18,8 @@
         <div class="container">
             <h2>Welcome to the Lobby</h2>
             <h3>Players in the Lobby:</h3>
-            <ul class="list-unstyled player-list">
-                <li>
-                    <img src="https://via.placeholder.com/80" alt="Player 1">
-                    <div>Player 1</div>
-                </li>
-                <li>
-                    <img src="https://via.placeholder.com/80" alt="Player 2">
-                    <div>Player 2</div>
-                </li>
-                <li>
-                    <img src="https://via.placeholder.com/80" alt="Player 3">
-                    <div>Player 3</div>
-                </li>
-                <!-- Add more player placeholders as needed -->
+            <ul class="list-unstyled player-list" id="player-list">
+
             </ul>
 
             <div class="chat-box mt-4 p-3 rounded">
@@ -64,27 +52,94 @@
     </button>
 
     <!-- Modal -->
-    <div class="modal fade" id="nameModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Player Name:</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Login or Register:</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <p id="error"></p>
-                            <input type="text" class="form-control" id="modal-username" name="username"
-                                   placeholder="Enter a Username" required>
-                            <input type="password" class="form-control" id="modal-password" name="password"
-                                   placeholder="Enter a Password" required>
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs" id="loginRegistrationTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab"
+                               aria-controls="login" aria-selected="true">Login</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="registration-tab" data-toggle="tab" href="#registration" role="tab"
+                               aria-controls="registration" aria-selected="false">Registration</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab content -->
+                    <div class="tab-content" id="loginRegistrationTabContent">
+                        <!-- Login Tab Content -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                            <!-- Login Form -->
+                            <form class="mt-3 mb-0" method="post">
+                                {% csrf_token %}
+                                <!-- Add your login form fields here -->
+                                <p id="login-error" class="error"></p>
+                                <div class="form-group row mb-0 mt-1">
+                                    <label for="username" class="col-sm-3">Username:</label>
+                                    <input type="text" class="form-control col-sm-8" id="modal-username" name="username"
+                                           required>
+                                </div>
+                                <div class="form-group row mt-1 mb-0">
+                                    <label for="password" class="col-sm-3">Password:</label>
+                                    <input type="password" class="form-control col-sm-8" id="modal-password"
+                                           name="password" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"></div>
+                                    <button type="button" class="col-sm-8 mt-1 black-btn btn-block"
+                                            onclick="verifyUsername('{% url "accounts:ajax_login_user" %}');">Login
+                                    </button>
+                                </div>
+                                <input type="hidden" id="next" value="{{ request.path }}">
+                            </form>
                         </div>
-                    </form>
+
+                        <!-- Registration Tab Content -->
+                        <div class="tab-pane fade" id="registration" role="tabpanel" aria-labelledby="registration-tab">
+                            <!-- Registration Form -->
+                            <!-- Login Form -->
+                            <form class="mb-0 mt-3" method="post">
+                                {% csrf_token %}
+                                <!-- Add your login form fields here -->
+                                <p id="registration-error" class="error"></p>
+                                <div class="form-group row mt-1 mb-0">
+                                    <label for="username" class="col-sm-3">Username:</label>
+                                    <input type="text" class="form-control col-sm-8" id="register-username"
+                                           name="username"
+                                           required>
+                                </div>
+                                <div class="form-group row mt-1 mb-0">
+                                    <label for="password" class="col-sm-3">Password:</label>
+                                    <input type="password" class="form-control col-sm-8" id="register-password"
+                                           name="password"
+                                           required>
+                                </div>
+                                <div class="form-group row mt-1 mb-0">
+                                    <label for="password" class="col-sm-3">Confirm Password:</label>
+                                    <input type="password" class="form-control col-sm-8" id="confirm-password"
+                                           name="password2"
+                                           required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3 mt-1"></div>
+                                    <button type="button" class="col-sm-8 mt-1 black-btn btn-block"
+                                            onclick="registerUser('{% url "accounts:ajax_register_user" %}');">Register
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -102,7 +157,7 @@
     <script>
         $(document).ready(function () {
             {% if not request.user.is_authenticated %}
-                $('#nameModal').modal('show');
+                $('#loginModal').modal('show');
             {% else %}
                 startCount()
             {% endif %}

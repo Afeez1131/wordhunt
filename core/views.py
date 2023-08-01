@@ -16,7 +16,6 @@ def index(request):
     logger.info('on the index page')
     return render(request, 'core/index.html', {})
 
-@forbidden_view
 def lobby(request, lobby_name):
     if not Lobby.objects.filter(lobby_name=lobby_name).exists():
         logger.info('invalid lobby name')

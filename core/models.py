@@ -34,6 +34,16 @@ class Lobby(models.Model):
     def __str__(self):
         return '{}: {}'.format(self.game_room.room_name, self.joined_count)
 
+    @property
+    def members_count(self):
+        return self.members.count()
+
+    def add(self, user):
+        return self.members.add(user)
+
+    def remove(self, user):
+        return self.members.remove(user)
+
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.shortcode:
             shortcode = str(self.lobby_name).split('-')[0]

@@ -14,6 +14,7 @@ def login_user(request):
     logger.info('checking to see if we have next in the URLS kwargs: {}'.format(str(next)))
     if request.method == 'POST':
         logger.info('posted DATA: ', request.POST)
+        logger.info(request.POST)
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)

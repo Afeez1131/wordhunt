@@ -71,7 +71,6 @@ function countdownTimer() {
     // Countdown timer
     let count = 5;
     const countdownInterval = setInterval(() => {
-        console.log(count);
         countdownElem.text(count);
         count--;
         if (count < 0) {
@@ -90,26 +89,61 @@ function startGame() {
 
 function verifyUsername(url) {
     $.ajax({
-    url: url,
-    type: 'POST',
-    dataType: 'JSON',
-    data: {
-        'csrfmiddlewaretoken': getCookie('csrftoken'),
-        'username': $('#modal-username').val(),
-        'password': $('#modal-password').val()
-    },
-    success: function (resp) {
-        if (resp.status === 'success') {
-            $('#nameModal').modal('hide');
+        url: url,
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            'csrfmiddlewaretoken': getCookie('csrftoken'),
+            'username': $('#modal-username').val(),
+            'password': $('#modal-password').val(),
+            'next': $('#next').val()
+        },
+        success: function (resp) {
+            if (resp.status === 'success') {
+                console.log(resp);
+                var next = resp.next
+                $('#loginModal').modal('hide');
+                setTimeout(() => {
+                    window.location.href = next
+                }, 1000)
+            }
+            if (resp.status === 'error') {
+                $('#login-error').text(resp.error)
+            }
+        },
+        error: function () {
+            console.log('error occured')
         }
-        if (resp.status === 'error') {
-            $('#error').text(resp.error)
+    })
+}
+
+function registerUser(url) {
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            'csrfmiddlewaretoken': getCookie('csrftoken'),
+            'username': $('#register-username').val(),
+            'password': $('#register-password').val(),
+            'confirm-password': $('#confirm-password').val()
+        },
+        success: function (resp) {
+            if (resp.status === 'success') {
+                var next = resp.next
+                $('#loginModal').modal('hide');
+                setTimeout(() => {
+                    window.location.href = next
+                }, 1000)
+            }
+            if (resp.status === 'error') {
+                $('#registration-error').text(resp.error)
+            }
+        },
+        error: function (resp) {
+            console.log('error occured')
         }
-    },
-    error: function () {
-        console.log('error occured')
-    }
-})
+    })
 }
 
 
