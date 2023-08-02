@@ -228,8 +228,7 @@ footer p {
 }
 
 #chat-section {
-    display: none;
-    max-width: 500px;
+    max-width: 800px;
     margin: 30px auto;
     background-color: #ffffff;
     border-radius: 10px;
@@ -357,6 +356,7 @@ footer p {
     border-radius: 2px;
     margin-bottom: 25px;
 }
+
 #login-box {
     max-width: 800px;
     padding: 60px;
@@ -376,6 +376,7 @@ footer p {
     color: #888888;
     text-decoration: none;
 }
+
 .form-heading {
     text-align: center;
     font-size: 32px;
@@ -443,10 +444,13 @@ footer p {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    text-align: left;
     overflow-y: scroll;
     max-height: 300px;
     color: #222222;
+}
+
+.wrapper {
+    text-align: left;
 }
 
 .lobby-section .chat-box .message {
@@ -457,21 +461,27 @@ footer p {
 }
 
 .lobby-section .chat-box .message.receiver {
-    background-color: #DCF8C6;
-    text-align: right;
-    padding-right: 15px;
+    max-width: 500px;
+    margin-right: 30%;
+    background-color: #E5E5E5;
+    text-align: left;
+    padding: 0 15px;
+    display: block;
 }
 
 .lobby-section .chat-box .message.sender {
-    background-color: #E5E5E5;
-    text-align: left;
-    padding-left: 15px;
+    max-width: 500px;
+    margin-left: 30%;
+    background-color: #DCF8C6;
+    text-align: right;
+    padding: 0 15px;
+    display: block;
 }
 
 .lobby-section .chat-box .message span {
-    font-weight: bold;
+    font-size: 12px;
     display: block;
-    margin-bottom: 5px;
+    padding: 5px 0;
 }
 
 .lobby-section .chat-box .message .date {
@@ -484,7 +494,7 @@ footer p {
     margin: 20px auto 0;
 }
 
-.lobby-section .chat-input input[type="text"] {
+.lobby-section .chat-input textarea {
     flex: 1;
     padding: 10px;
     border: 1px solid #ccc;
@@ -511,4 +521,49 @@ footer p {
 
 .error {
     color: red;
+}
+
+.notification {
+    font-size: 12px;
+    color: #888888;
+    text-align: center;
+    display: block;
+
+}
+
+/* emoji */
+/* Add your CSS styles here */
+.emoji-container {
+    background-color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 1rem 5px;
+    max-width: 800px;
+    margin: 1rem auto;
+}
+
+.emoji-option {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin: 2px;
+    padding: 0;
+}
+
+.rule-heading {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.rule-wrapper {
+    background-color: #e0e0e0;
+    text-align: left;
+    font-size: 12px;
+    max-width: 400px;
+    margin: auto;
+    border-radius: 10px;
+    padding: 20px 20px 20px 0;
+    margin-bottom: 10px;
 }

@@ -1,11 +1,12 @@
 /* Variables */
-var body = $('body');
-var scheme = body.data('scheme')
-var host = body.data('host')
-console.log(scheme, host);
-var protocol = scheme === 'http' ? 'ws://' : 'wss://'
-const url = protocol + host + '/ws/game/'
-console.log(url);
+const body = $('body');
+const scheme = body.data('scheme')
+const host = body.data('host')
+const path_name = window.location.pathname.split('/')
+const room_name = path_name[path_name.length - 1]
+const protocol = scheme === 'http' ? 'ws://' : 'wss://'
+const url = protocol + host + '/ws/game/'+ room_name + '/'
+const chatBox = $('#chat-box')
 const socket = new WebSocket(url);
 
 socket.onopen = function () {
@@ -13,45 +14,67 @@ socket.onopen = function () {
 }
 
 socket.onmessage = function (event) {
+    console.log('event: ', event);
     const data = JSON.parse(event.data);
-    console.log(data);
-    switch (data.action) {
+    const dataMessage = data.data;
+    switch (data.type) {
         case "connected":
             $('p#connected').text(data.message)
             break;
-        case "time":
-            $('p#time').text(data.message);
+        case "game_rule":
+            let rule = dataMessage.rule_template
+            // chatBox.prepend(rule);
+        case "echo_user_response":
+            let sender = dataMessage.sender;
+            if (sender === user) {
+                chatBox.append(dataMessage.sender_template);
+            } else {
+                chatBox.append(dataMessage.receiver_template);
+            }
+            scrollToBottom();
             break;
     }
 }
 
 // Submit button click effect
-const submitButton = $('#submit-button');
+const submitButton = $('#send-button');
+const inputText = $('#player-message')
+
 submitButton.click(function () {
-    // Implement the action to be performed when the submit button is clicked.
-    // For example, sending the word to the backend for validation and updating chat messages.
-    addText();
+    console.log('clicked submit button');
+    let text = inputText.val();
+    const msg = {
+        'action': 'player_message',
+        'data': {
+            'message': text,
+            'sender': user
+        }
+    }
+    inputText.val('');
+    sendData(msg, socket);
 });
 
-function addText() {
-    var inputText = input.val();
-    if (inputText !== '') {
-        var temp = `<div class="other-user-message">
-                <div class="message-text">
-                    <span class="user-name">Mary:</span> ${inputText}
-                    <span class="message-time">10:20 AM</span>
-                </div>
-            </div>`
-        $('#chat-messages').append(temp);
-    }
-    scrollToBottom();
-
+function sendData(message, socket) {
+    socket.send(JSON.stringify(message))
 }
 
 function scrollToBottom() {
-    const chatMessages = document.getElementById('chat-messages');
-    const lastMessage = chatMessages.lastElementChild;
-    if (lastMessage) {
-        lastMessage.scrollIntoView({behavior: 'smooth', block: 'end'});
-    }
+    // Get the chat container element
+    const chatContainer = $(".chat-box");
+
+    // Calculate the distance to scroll
+    const scrollHeight = chatContainer[0].scrollHeight;
+    console.log('height: ', scrollHeight);
+
+    // Animate the scrolling to the bottom
+    chatContainer.animate({scrollTop: scrollHeight}, 'slow');
 }
+
+$(document).ready(function() {
+    inputText.focus();
+    inputText.on('keydown', function(event) {
+        if (event.keyCode === 13) {
+            submitButton.click();
+        }
+    })
+})

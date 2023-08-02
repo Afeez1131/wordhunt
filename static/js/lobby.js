@@ -76,6 +76,7 @@ function countdownTimer() {
         if (count < 0) {
             $('#lobby-section').show();
             countdownContainer.hide();
+            $('#chat-message').focus();
             clearInterval(countdownInterval);
         }
     }, 1000);
@@ -145,5 +146,3 @@ function registerUser(url) {
         }
     })
 }
-
-

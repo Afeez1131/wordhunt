@@ -9,5 +9,5 @@ urlpatterns = [
     path('verify-code', views.verify_code, name='verify_code'),
     path('start-game', ajax_create_game, name='ajax_create_game'),
     path('lobby/<uuid:lobby_name>', views.lobby, name='lobby'),
-    path('chat', views.chatroom, name='chat'),
+    path('game-room/<uuid:room_name>', views.chatroom, name='game_room'),
 ]

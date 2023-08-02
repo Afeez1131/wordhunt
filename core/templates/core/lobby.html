@@ -1,4 +1,5 @@
 {% extends 'core/_base.html' %}
+{% load extra_tags %}
 {% load static %}
 
 {% block title %}Lobby{% endblock title %}
@@ -8,6 +9,7 @@
 {% endblock extra_head %}
 
 {% block content %}
+
     <div id="countdown-container">
         <h1 id="heading"></h1>
         <div id="countdown" class="font-game text-center">5</div>
@@ -19,31 +21,24 @@
             <h2>Welcome to the Lobby</h2>
             <h3>Players in the Lobby:</h3>
             <ul class="list-unstyled player-list" id="player-list">
-
             </ul>
 
             <div class="chat-box mt-4 p-3 rounded">
-                <div class="message receiver mb-2">
-                    <span class="font-weight-bold">Player 2:</span> Hey, is everyone ready to play?
-                    <span class="date">2023-07-26 10:15 AM</span>
-                </div>
-                <div class="message sender mb-2">
-                    <span class="font-weight-bold">Player 1:</span> Yes, I am! Let's get started.
-                    <span class="date">2023-07-26 10:20 AM</span>
-                </div>
-                <div class="message receiver mb-2">
-                    <span class="font-weight-bold">Player 3:</span> I'm excited for this game!I'm excited for this
-                    game!I'm excited for this game!I'm excited for this game!I'm excited for this game!
-                    <span class="date">2023-07-26 10:25 AM</span>
-                </div>
-                <!-- Add more dummy messages from different users -->
+                <div class="wrapper" id="chat-box"></div>
+
             </div>
-            <div class="chat-input d-flex">
-                <input type="text" placeholder="Type your message..." id="chat-message">
-                <button class="btn btn-secondary" id="send-button">Send</button>
-            </div>
-            <button class="btn btn-success start-button mt-4" onclick="startGame()">Start Game</button>
         </div>
+        <div class="chat-input d-flex">
+            <textarea placeholder="Type your message..." id="chat-message" cols="100"></textarea>
+            <button class="btn btn-secondary" id="send-button">Send</button>
+        </div>
+        <div id="emoji-container" class="emoji-container"></div>
+        {% is_game_creator request lobby.lobby_name as is_game_creator %}
+        {% if is_game_creator %}
+            <button type="button" class="btn btn-success start-button mt-4" id="start-button">
+                Start Game
+            </button>
+        {% endif %}
     </section>
 
     {#  get player's name modal #}
@@ -162,6 +157,8 @@
                 startCount()
             {% endif %}
         });
+
+        var username = '{{ request.user.username }}';
     </script>
 {% endblock extra_script %}
 

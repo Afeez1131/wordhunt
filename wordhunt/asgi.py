@@ -15,6 +15,7 @@ from django.core.asgi import get_asgi_application
 from django.urls import re_path, path
 
 from core import consumers
+from core.game_consumers import GameRoomConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wordhunt.settings')
 
@@ -22,7 +23,7 @@ application = ProtocolTypeRouter({
     'http': get_asgi_application(),
     'websocket': AuthMiddlewareStack(
         URLRouter([
-            path('ws/game/', consumers.WordHuntConsumer.as_asgi()),
+            path('ws/game/<str:room_uuid>/', GameRoomConsumer.as_asgi()),
             path(r'ws/lobby/<str:uuid>/', consumers.LobbyChatConsumer.as_asgi()),
         ])
     )

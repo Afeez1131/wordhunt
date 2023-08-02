@@ -9,75 +9,11 @@ from django.contrib.auth import authenticate
 from django.template.loader import render_to_string
 import logging
 
-from core.models import Lobby
+from django.urls import reverse
+
+from core.models import Lobby, GameRoom
 
 logger = logging.getLogger(__name__)
-
-
-class WordHuntConsumer(JsonWebsocketConsumer):
-    def __init__(self, *args, **kwargs):
-        super(WordHuntConsumer, self).__init__(*args, **kwargs)
-        self.room_name = 'game_room'
-
-    def connect(self):
-        print('-----------connecting---------------')
-        self.accept()
-        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
-        self.send_json({
-            'action': 'connected',
-            'message': 'You are connected to the webscoket',
-            'html': render_to_string('core/login.html'),
-            'selector': '#container'
-        })
-
-    def disconnect(self, code):
-        print('----------disconnecting------------')
-        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
-
-    def receive_json(self, content, **kwargs):
-        print('-----------incoming json content from client----------')
-        print(content, type(content))
-        action = content.get('action')
-        data = content.get('data')
-        print('data: ', json.loads(data))
-        if action == 'authenticate':
-            request = data.get('request')
-            username = data.get('username')
-            password = data.get('password')
-            print(request, username, password)
-            # user = authenticate(request, username=username, password=password)
-
-
-"""
-    "Let's kick off with the word 'delightful'!"
-    "Your challenge begins with the word 'magnificent'!"
-    "Get ready to create words from 'fascinating'!"
-    "Today's base word is 'adventure.' Let the game begin!"
-    "Form new words from the base word 'wonderful'!"
-    "The starting word is 'breathtaking.' Good luck, WordWarriors!"
-    "We'll start with the word 'fantastic.' Happy word-building!"
-"""
-
-"""
-    "Time for a new challenge! The word now is 'spectacular'!"
-    "Let's level up! Your next base word is 'unbelievable'!"
-    "Get ready for the next word: 'extraordinary'!"
-    "Here comes the next base word: 'marvelous'!"
-    "On to the next one! The word is now 'phenomenal'!"
-    "New word alert: 'astonishing'! Keep those words coming!"
-    "Ready for more? Your next word is 'remarkable'!"
-"""
-
-"""
-    "Congratulations to our WordWarrior champion! The winner is [Player's Name]!"
-    "And the crown of WordWarrior goes to [Player's Name] for their outstanding word skills!"
-    "Give it up for our victorious WordWarrior, [Player's Name]!"
-    "A round of applause for the winner of this word battle, [Player's Name]!"
-    "We have a winner, and it's none other than [Player's Name]! Well done!"
-    "The word master who emerged victorious is [Player's Name]! Incredible job!"
-    "And the title of WordWarrior for this game goes to [Player's Name]! Well-deserved!"
-"""
-
 
 class LobbyChatConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -100,6 +36,7 @@ class LobbyChatConsumer(JsonWebsocketConsumer):
         self.lobby = Lobby.objects.get(lobby_name=lobby_uuid)
         self.room_name = str(self.lobby.lobby_name)
         async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
+        self.send_join_alert()
         self.lobby.add(self.user.id)
         if self.lobby.members_count > 1:
             self.send_all_members()
@@ -113,6 +50,7 @@ class LobbyChatConsumer(JsonWebsocketConsumer):
 
     def disconnect(self, code=None):
         logger.info('disconnecting...')
+        self.send_left_alert()
         logger.info(f'removing {self.user} from {self.room_name}')
         self.lobby.remove(self.user.id)
         self.send_all_members()
@@ -120,7 +58,59 @@ class LobbyChatConsumer(JsonWebsocketConsumer):
         # return super(LobbyChatConsumer, self).disconnect(code)
 
     def receive_json(self, content, **kwargs):
-        print('content: ', content)
+        print('content receiver...', content)
+        action = content.get('action')
+        data = content.get('data')
+        if action == 'new_message':
+            message = data.get('message')
+            sender = data.get('sender')
+            context = {
+                'message': message,
+                'time': str(datetime.datetime.now().strftime("%H: %M: %S")),
+                'username': sender
+            }
+            message_sender = render_to_string('core/message_sender.html', context)
+            message_receiver = render_to_string('core/message_receiver.html', context)
+
+            async_to_sync(self.channel_layer.group_send)(self.room_name, {
+                'type': 'echo_message',
+                'data': {
+                    'message_sender': message_sender,
+                    'message_receiver': message_receiver,
+                    'sender': sender
+                }
+            })
+        if action == 'start_game':
+            url = reverse('core:game_room', args=[self.lobby.game_room.room_name])
+            logger.info('Game ROOM URL: ', url)
+            async_to_sync(self.channel_layer.group_send)(self.room_name, {
+                'type': 'start_game',
+                'data': {
+                    'game_room': url
+                }
+            })
+
+    def send_join_alert(self):
+        msg = '{} join the lobby'.format(self.user.username)
+        message = render_to_string('core/alert.html', {'message': msg})
+        async_to_sync(self.channel_layer.group_send)(self.room_name, {
+            'type': 'join_chat_alert',
+            'data': {
+                'message': message,
+                'player': self.user.username
+            }
+        })
+
+    def send_left_alert(self):
+        msg = '{} exit the lobby'.format(self.user.username)
+        message = render_to_string('core/alert.html', {'message': msg})
+        async_to_sync(self.channel_layer.group_send)(self.room_name, {
+            'type': 'left_chat_alert',
+            'data': {
+                'message': message,
+                'player': self.user.username
+            }
+        })
 
     def send_player_information(self):
         player = self.user.username
@@ -130,7 +120,8 @@ class LobbyChatConsumer(JsonWebsocketConsumer):
                                                          'type': 'player_joined',
                                                          'data': {
                                                              'message': '{} joined the Lobby'.format(player),
-                                                             'image': player_image
+                                                             'image': player_image,
+                                                             'joined_user': player
                                                          }
                                                      })
 
@@ -141,11 +132,25 @@ class LobbyChatConsumer(JsonWebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(self.room_name, {
             'type': 'all_players',
             'data': {
-                'images': players_images
+                'images': players_images,
+
             }
         })
+
     def player_joined(self, event):
         self.send_json(event)
 
-    def all_players(self,event):
+    def all_players(self, event):
+        self.send_json(event)
+
+    def echo_message(self, event):
+        self.send_json(event)
+
+    def join_chat_alert(self, event):
+        self.send_json(event)
+
+    def left_chat_alert(self, event):
+        self.send_json(event)
+
+    def start_game(self, event):
         self.send_json(event)

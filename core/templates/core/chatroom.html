@@ -3,74 +3,43 @@
 
 {% block title %}room name {% endblock title %}
 {% block extra_head %}
-     <script defer type="text/javascript" src="{% static 'js/lobby.js' %}"></script>
-    <script defer type="text/javascript" src="{% static 'js/chatroom.js' %}"></script>
 {% endblock extra_head %}
 
 {% block content %}
-    <div id="countdown-container">
-    <h1 id="heading"></h1>
-        <div id="countdown" class="font-game text-center">5</div>
-        <h4 id="quote" class="font-game">
-        </h4>
-    </div>
+    <section class="lobby-section" id="lobby-section">
+        <div class="container">
+            <h2>Welcome to the Game Room</h2>
+            <h3>Active Players:</h3>
+            <ul class="list-unstyled player-list" id="player-list">
+            </ul>
 
-    <div id="chat-section">
-        <div id="group-name">
-            <img id="group-image" src="group_image.jpg" alt="Group Image">
-            <h4 class="m-0">WordWarriors Group Chat</h4>
-        </div>
-        <div id="chat-messages">
-            <!-- System message displaying the rules -->
-            <div class="message system-message">
-                <div class="message-text ">
-                    <h3 class="text-center">Welcome to WordWarriors! Here are the rules:</h3>
-                    <ol>
-                        <li>Objective: Form valid English words from a given base word within a limited time.</li>
-                        <li>Game Setup: Join the game room with a unique username. A host manages the game.</li>
-                        <li>Word Formation: Use letters from the base word to create valid English words. Rearrange
-                            letters and use each letter only once.
-                        </li>
-                        <li>Word Validation: Submit words for validation after the time is up. Invalid or misspelled
-                            words won't be counted.
-                        </li>
-                        <li>Scoring: Earn points for valid words formed.</li>
-                    </ol>
-                </div>
-            </div>
-            <div class="message backend-message">
-                Hello everyone! Let's start the game. The base word is "listen."
-            </div>
-            <div class="user-message">
-                <div class="message-text">
-                    <span class="user-name">John:</span> I got "ten" and "list.", got "ten" and "list.",got "ten" and
-                    "list.",got "ten" and "list."
-                    <span class="message-time">10:15 AM</span>
-                </div>
-            </div>
-            <div class="other-user-message">
-                <div class="message-text">
-                    <span class="user-name">Mary:</span> "net" and "silent" for me!
-                    <span class="message-time">10:20 AM</span>
-                </div>
-            </div>
-            <!-- Add more messages here -->
-        </div>
-        <div id="chat-input">
-            <form>
-                <div class="form-row">
-                    <div class="col">
-                        <input type="text" class="form-control" id="text-input" placeholder="Enter your word...">
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-primary" id="submit-button">Submit</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+            <div class="chat-box mt-4 p-3 rounded">
+                {% include 'core/game_rules.html' %}
+                <div class="wrapper" id="chat-box">
 
+                </div>
+
+            </div>
+        </div>
+        <div class="chat-input d-flex">
+            <textarea placeholder="Type your message..." id="player-message" cols="100"></textarea>
+            <button class="btn btn-secondary" id="send-button">Send</button>
+        </div>
+        <div id="emoji-container" class="emoji-container"></div>
+            <button type="button" class="btn btn-success start-button mt-4" id="start-button">
+                Start Game
+            </button>
+    </section>
 
 {% endblock content %}
 
+
+{% block extra_script %}
+    <script type="text/javascript">
+        const roomName = '{{ game_room.room_name }}'
+        const user = '{{ request.user.username }}';
+    </script>
+    <script defer type="text/javascript" src="{% static 'js/chatroom.js' %}"></script>
+
+{% endblock extra_script %}
 
