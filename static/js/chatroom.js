@@ -5,34 +5,41 @@ const host = body.data('host')
 const path_name = window.location.pathname.split('/')
 const room_name = path_name[path_name.length - 1]
 const protocol = scheme === 'http' ? 'ws://' : 'wss://'
-const url = protocol + host + '/ws/game/'+ room_name + '/'
+const url = protocol + host + '/ws/game/'+ room_name + '/?1'
 const chatBox = $('#chat-box')
 const socket = new WebSocket(url);
 
 socket.onopen = function () {
-    console.log('connection success...');
+    console.log('connection success...', url);
 }
 
 socket.onmessage = function (event) {
-    console.log('event: ', event);
+    // console.log('event: ', event);
     const data = JSON.parse(event.data);
-    const dataMessage = data.data;
+    console.log('data: ', data);
     switch (data.type) {
         case "connected":
             $('p#connected').text(data.message)
             break;
         case "game_rule":
-            let rule = dataMessage.rule_template
+            let rule = data.rule_template
             // chatBox.prepend(rule);
+            break;
         case "echo_user_response":
-            let sender = dataMessage.sender;
+            let sender = data.sender;
             if (sender === user) {
-                chatBox.append(dataMessage.sender_template);
+                chatBox.append(data.sender_template);
             } else {
-                chatBox.append(dataMessage.receiver_template);
+                chatBox.append(data.receiver_template);
             }
             scrollToBottom();
             break;
+        case "countdown":
+            let count = data.countdown;
+            // if
+            chatBox.html('<span class="notification" id="notification">\n' +
+                '   <h3>' + count + '</h3>\n' +
+                '</span>\n')
     }
 }
 
@@ -41,7 +48,6 @@ const submitButton = $('#send-button');
 const inputText = $('#player-message')
 
 submitButton.click(function () {
-    console.log('clicked submit button');
     let text = inputText.val();
     const msg = {
         'action': 'player_message',

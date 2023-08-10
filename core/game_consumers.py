@@ -1,52 +1,64 @@
+import asyncio
 import datetime
 import json
 import logging
+import threading
+import time
 
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import JsonWebsocketConsumer
+from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.template.loader import render_to_string
 
 from core.models import GameRoom
+from core.utils import send_api_request
 
 logger = logging.getLogger(__name__)
 
 
-class GameRoomConsumer(JsonWebsocketConsumer):
+class GameRoomConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super(GameRoomConsumer, self).__init__(*args, **kwargs)
         self.room_name = None
         self.user = None
 
-    def connect(self):
+    async def connect(self):
         logger.info('connecting to the game room')
         self.user = self.scope.get('user')
         if not self.user.is_authenticated:
             logger.info('closing connection, user not authenticated')
-            self.close()
+            await self.close()
+            return
+
         room_name = self.scope.get('url_route').get('kwargs').get('room_uuid')
         self.room_name = str(room_name)
-        if not GameRoom.objects.filter(room_name=self.room_name).exists():
+        if not await database_sync_to_async(GameRoom.objects.filter(room_name=self.room_name).exists)():
             logger.info(f'invalid room name {self.room_name}')
-            self.close()
-        logger.info('accepting connection')
-        self.accept()
-        logger.info(f'adding user to {self.room_name}')
+            await self.close()
+            return
+        logger.info('accepting connection into the game room')
+        await self.accept()
+        logger.info(f'connection accepted: adding {self.user.username} to {self.room_name}')
 
-        self.send_json({
+        await self.send_json({
             'message': f'connection successful {self.user.username}'
         })
-        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
+        await self.channel_layer.group_add(self.room_name, self.channel_name)
+        await self.game_countdown(10)
 
-    def close(self, code=None):
+    async def close(self, code=None):
         logger.info('closing connection')
         return super(GameRoomConsumer, self).close(code)
 
-    def disconnect(self, code=None):
-        logger.info(f'disconnecting from {self.room_name}')
-        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
+    async def disconnect(self, code=None):
+        logger.info('disconnecting user...')
+        if self.user.is_authenticated:
+            logger.info(f'disconnecting {self.user} from {self.room_name}')
+        await self.channel_layer.group_discard(self.room_name, self.channel_name)
 
-    def receive_json(self, content, **kwargs):
+    async def receive_json(self, content, **kwargs):
         logger.info('incoming content from client: ')
+        logger.info('content: ', content)
         action = content.get('action')
         data = content.get('data')
         if action == 'player_message':
@@ -54,9 +66,9 @@ class GameRoomConsumer(JsonWebsocketConsumer):
             context = {'message': message,
                        'time': str(datetime.datetime.now().strftime("%H:%M:%S")),
                        'username': self.user.username}
-            sender_template = render_to_string('core/message_sender.html', context)
-            receiver_template = render_to_string('core/message_receiver.html', context)
-            async_to_sync(self.channel_layer.group_send)(self.room_name, {
+            sender_template = await database_sync_to_async(render_to_string)('core/message_sender.html', context)
+            receiver_template = await database_sync_to_async(render_to_string)('core/message_receiver.html', context)
+            await self.channel_layer.group_send(self.room_name, {
                 'type': 'echo_user_response',
                 'data': {
                     'sender_template': sender_template,
@@ -65,11 +77,30 @@ class GameRoomConsumer(JsonWebsocketConsumer):
                 }
             })
 
-    def echo_user_response(self, event):
+    async def game_countdown(self, countdown):
+        while countdown > 0:
+            message = await database_sync_to_async(render_to_string)('core/countdown.html', {'countdown': countdown})
+
+            await self.send_json({
+                'type': 'countdown',
+                'countdown': message
+            })
+            countdown -= 1
+            await asyncio.sleep(2)
+
+    # async def verify_word(self):
+    #     valid_english = await send_api_request(countdown)
+    def countdown(self, event):
         self.send_json(event)
 
-    def game_rule(self, event):
-        self.send_json(event)
+    async def echo_user_response(self, event):
+        await self.send_json(event)
+
+    async def game_rule(self, event):
+        await self.send_json(event)
+
+    async def send_base_word(self, event):
+        await  self.send_json(event)
 
 
 """

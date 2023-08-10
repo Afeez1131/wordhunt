@@ -14,6 +14,7 @@ const sendButton = $('#send-button');
 
 const socket = new WebSocket(url);
 
+
 $(document).ready(function () {
     // Handle Enter key press on the input field
     inputText.focus();
@@ -30,6 +31,12 @@ socket.onopen = function (event) {
 
 socket.onclose = function (event) {
     console.log('disconnected...')
+    console.log('trying to reconnect...')
+    setTimeout(connect, 3000);
+}
+
+socket.onerror = function (event) {
+    console.log('error occured', event);
 }
 
 socket.onmessage = function (event) {
@@ -37,7 +44,7 @@ socket.onmessage = function (event) {
     const dataObj = JSON.parse(event.data)
     const dataMessage = dataObj.data
     const player_list = $('#player-list')
-    const chatBox = $('#chat-box')
+    const chatBox = $('#chat-box');
 
     switch (dataObj.type) {
         case 'player_joined':
@@ -77,8 +84,8 @@ socket.onmessage = function (event) {
             break;
         case 'start_game':
             let url = dataMessage.game_room;
-            setTimeout(()=> {
-                window.location.href=url
+            setTimeout(() => {
+                window.location.href = url
             }, 1000);
             break;
     }
@@ -133,14 +140,12 @@ $(document).ready(() => {
         emojiContainer.append(emojiButton);
     })
 
-    $('.emoji-option').click(function() {
+    $('.emoji-option').click(function () {
         const emoji = $(this).text();
         const cursorPos = inputText[0].selectionStart;
-        console.log(cursorPos)
         const inputVal = inputText.val()
         const beforeCursor = inputVal.slice(0, cursorPos)
         const afterCursor = inputVal.slice(cursorPos)
-        console.log(beforeCursor, emoji, afterCursor);
         const newValue = beforeCursor + emoji + afterCursor;
         inputText.val(newValue);
         inputText.focus();
@@ -149,7 +154,7 @@ $(document).ready(() => {
 
 
 const startGameButton = $('#start-button')
-startGameButton.click(function() {
+startGameButton.click(function () {
     console.log('clicked start game button');
     const message = {
         'action': 'start_game',

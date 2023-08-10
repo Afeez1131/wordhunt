@@ -16,16 +16,26 @@ from django.urls import re_path, path
 
 from core import consumers
 from core.game_consumers import GameRoomConsumer
+from core.middleware import QueryAuthentication
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wordhunt.settings')
+#
+# application = ProtocolTypeRouter({
+#     'http': get_asgi_application(),
+#     'websocket': AuthMiddlewareStack(
+#         URLRouter([
+#             path('ws/game/<str:room_uuid>/', GameRoomConsumer.as_asgi()),
+#             path(r'ws/lobby/<str:uuid>/', consumers.LobbyChatConsumer.as_asgi()),
+#         ]),
+#     ),
+# })
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
+    'websocket': QueryAuthentication(AuthMiddlewareStack(
         URLRouter([
             path('ws/game/<str:room_uuid>/', GameRoomConsumer.as_asgi()),
             path(r'ws/lobby/<str:uuid>/', consumers.LobbyChatConsumer.as_asgi()),
-        ])
-    )
+        ]),
+    ),)
 })
-
